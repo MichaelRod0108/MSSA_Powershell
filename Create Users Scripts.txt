@@ -1,0 +1,26 @@
+New-ADUser -Name "James Paterson,George Martin,Jay Tolkien,Stephen King"
+
+New-ADOrganizationalUnit -DisplayName "Authors"
+
+Remove-ADOrganizationalUnit -Identity "OU=Authors,DC=Adatum,DC=com"
+
+Set-ADAccountPassword -Identity "stephen king" -Reset -NewPassword (ConvertTo-SecureString -AsPlainText "Pa55w.rd" -Force)
+
+Set-ADUser -Identity "stephen king" -PasswordNeverExpires $true
+
+Set-ADUser -Identity "stephen king" -Enabled $true
+
+New-ADGroup -Name "Fantasy" -GroupScope global -DisplayName "Fantasy Authors" -Path "OU=Authors,DC=Adatum,DC=com" -Description "Members in this group are fantasy authors"
+
+Add-ADGroupMember -Identity "Fantasy" -Members "george martin"
+
+Add-ADGroupMember -Identity "Fantasy" -Members "jay tolkien"
+
+New-GPO -Name "Romance GPO" | New-GPLink -Target "OU=Authors,DC=Adatum,DC=com" | Set-GPPermissions -PermissionLevel GpoEdit -TargetName "Romance" -TargetType Group
+
+$Parameters = @{
+    Name = 'AuthorsDrive'
+    Path = 'F:\'
+    FullAccess = 'Adatum\Administrator'
+}
+New-SmbShare @Parameters
